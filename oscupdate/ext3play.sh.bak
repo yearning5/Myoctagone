@@ -1,0 +1,17 @@
+#!/bin/bash
+opkg update
+opkg install util-linux
+opkg install openssh-sftp-server
+opkg install samba
+opkg install python-pip
+pip install requests
+pip install --upgrade setuptools
+pip install bs4
+opkg remove enigma2-plugin-systemplugins-serviceapp exteplayer3 ffmpeg
+opkg install ffmpeg exteplayer3 enigma2-plugin-systemplugins-serviceapp duktape
+cd /usr/bin
+ln -s gstplayer gstplayer_gst-1.0
+opkg install gstplayer
+python /oscupdate/ffinstall.py
+opkg install inadyn-mt
+reboot
