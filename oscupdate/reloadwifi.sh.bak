@@ -1,0 +1,5 @@
+#!/bin/sh
+rmmod 8192eu
+mmmod cfg80211
+modprobe cfg80211
+modprobe 8192eu

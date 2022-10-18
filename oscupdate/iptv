@@ -1,0 +1,180 @@
+import requests
+import re
+import os
+from datetime import date, timedelta
+import datetime
+if os.path.isfile('/etc/enigma2/userbouquet.arabip__tv_.tv'):
+    os.remove('/etc/enigma2/userbouquet.arabip__tv_.tv')
+    file=open('/etc/enigma2/userbouquet.arabip__tv_.tv','w')
+    file.close()
+else:
+    file=open('/etc/enigma2/userbouquet.arabip__tv_.tv','w')
+    file.close()
+#france__sport    
+if os.path.isfile('/etc/enigma2/userbouquet.france__tv_.tv'):
+    os.remove('/etc/enigma2/userbouquet.france__tv_.tv')
+    file=open('/etc/enigma2/userbouquet.france__tv_.tv','w')
+    file.close()
+else:
+    file=open('/etc/enigma2/userbouquet.france__tv_.tv','w')
+    file.close()
+#sports
+if os.path.isfile('/etc/enigma2/userbouquet.sportip__tv_.tv'):
+    os.remove('/etc/enigma2/userbouquet.sportip__tv_.tv')
+    file=open('/etc/enigma2/userbouquet.sportip__tv_.tv','w')
+    file.close()
+else:
+    file=open('/etc/enigma2/userbouquet.sportip__tv_.tv','w')
+    file.close()
+
+tday=datetime.datetime.today().strftime('%d')
+tmonth=datetime.datetime.today().strftime('%m')
+tyear=datetime.datetime.today().strftime('%Y')
+tdate=datetime.datetime.today().strftime('%d-%m-%Y')
+link='https://www.iptv4sat.com/tyear/tmonth/'
+f = requests.get(link)
+the_page = f.text
+the_page =the_page.encode('ascii', 'ignore')
+
+srch='https://www.iptv4sat.com/'+tyear+'/'+tmonth+'/(.*?)'+tdate+'/"'
+a=re.findall(srch,the_page,re.DOTALL)
+for i in range(len(a)):
+    if len(a[i])<200:
+        if 'arab' in a[i]:
+            break
+linka='https://www.iptv4sat.com/2018/08/'+a[i]+'-21-08-2018/'
+
+for i in range(len(a)):
+    if len(a[i])<200:
+        if 'franc' in a[i]:
+            break
+linkfr='https://www.iptv4sat.com/2018/08/'+a[i]+'-21-08-2018/'
+
+
+for i in range(len(a)):
+    if len(a[i])<200:
+        if 'sport' in a[i]:
+            break
+linkspr='https://www.iptv4sat.com/2018/08/'+a[i]+'-21-08-2018/'
+
+
+#arabic
+f = requests.get(linka)
+the_page = f.text
+the_page =the_page.encode('ascii', 'ignore')
+aa=the_page.find('https://www.iptv4sat.com/download-attachment')
+b=the_page[aa:].find('"')
+downlinka=the_page[aa:aa+b]
+import requests, zipfile, StringIO
+r = requests.get(downlinka, stream=True)
+z = zipfile.ZipFile(StringIO.StringIO(r.content))
+z.extractall('/tmp')
+locatf='/tmp/'+z.namelist()[0]
+m3ufl = open(locatf,'r')
+m3uf = m3ufl.readlines()
+m3ufl.close
+m3ufl = open(locatf,'w')
+for line in m3uf:
+    if line.strip():
+        m3ufl.write(line)
+m3ufl.close
+m3uf = open(locatf,'r')
+m3uf = m3uf.readlines()
+# the first line containing channel name
+for i in range(len(m3uf)):
+    if m3uf[i].find('EXTINF')>-1:
+        count=i
+        break
+file=open('/etc/enigma2/userbouquet.arabip__tv_.tv','w')
+file.write('#NAME arabip (TV)\n')
+while i <len(m3uf)-1:
+    channel=m3uf[i].strip('\n').split(',')[1].replace(':','')
+    channel=channel.strip('\r')
+    a1=m3uf[i+1].strip('\n')
+    a1=a1.strip('\r')
+    a=a1.replace(':','%3a')+':'+channel+'\n'
+    channelurl='#SERVICE 4097:0:1:0:0:0:0:0:0:0:'+a
+    file.write(channelurl)
+    file.write('#DESCRIPTION '+channel+'\n')
+    i = i+2
+file.close()
+#France
+f = requests.get(linkfr)
+the_page = f.text
+the_page =the_page.encode('ascii', 'ignore')
+aa=the_page.find('https://www.iptv4sat.com/download-attachment')
+b=the_page[aa:].find('"')
+downlinkfr=the_page[aa:aa+b]
+import requests, zipfile, StringIO
+r = requests.get(downlinkfr, stream=True)
+z = zipfile.ZipFile(StringIO.StringIO(r.content))
+z.extractall('/tmp')
+locatf='/tmp/'+z.namelist()[0]
+m3ufl = open(locatf,'r')
+m3uf = m3ufl.readlines()
+m3ufl.close
+m3ufl = open(locatf,'w')
+for line in m3uf:
+    if line.strip():
+        m3ufl.write(line)
+m3ufl.close
+m3uf = open(locatf,'r')
+m3uf = m3uf.readlines()
+# the first line containing channel name
+for i in range(len(m3uf)):
+    if m3uf[i].find('EXTINF')>-1:
+        count=i
+        break
+file=open('/etc/enigma2/userbouquet.france__tv_.tv','w')
+file.write('#NAME france (TV)\n')
+while i <len(m3uf)-1:
+    channel=m3uf[i].strip('\n').split(',')[1].replace(':','')
+    channel=channel.strip('\r')
+    a1=m3uf[i+1].strip('\n')
+    a1=a1.strip('\r')
+    a=a1.replace(':','%3a')+':'+channel+'\n'
+    channelurl='#SERVICE 4097:0:1:0:0:0:0:0:0:0:'+a
+    file.write(channelurl)
+    file.write('#DESCRIPTION '+channel+'\n')
+    i = i+2
+file.close()
+#Sport
+f = requests.get(linkspr)
+the_page = f.text
+the_page =the_page.encode('ascii', 'ignore')
+aa=the_page.find('https://www.iptv4sat.com/download-attachment')
+b=the_page[aa:].find('"')
+downlinkspr=the_page[aa:aa+b]
+import requests, zipfile, StringIO
+r = requests.get(downlinkspr, stream=True)
+z = zipfile.ZipFile(StringIO.StringIO(r.content))
+z.extractall('/tmp')
+locatf='/tmp/'+z.namelist()[0]
+m3ufl = open(locatf,'r')
+m3uf = m3ufl.readlines()
+m3ufl.close
+m3ufl = open(locatf,'w')
+for line in m3uf:
+    if line.strip():
+        m3ufl.write(line)
+m3ufl.close
+m3uf = open(locatf,'r')
+m3uf = m3uf.readlines()
+# the first line containing channel name
+for i in range(len(m3uf)):
+    if m3uf[i].find('EXTINF')>-1:
+        count=i
+        break
+file=open('/etc/enigma2/userbouquet.sportip__tv_.tv','w')
+file.write('#NAME sportip (TV)\n')
+while i <len(m3uf)-1:
+    channel=m3uf[i].strip('\n').split(',')[1].replace(':','')
+    channel=channel.strip('\r')
+    a1=m3uf[i+1].strip('\n')
+    a1=a1.strip('\r')
+    a=a1.replace(':','%3a')+':'+channel+'\n'
+    channelurl='#SERVICE 4097:0:1:0:0:0:0:0:0:0:'+a
+    file.write(channelurl)
+    file.write('#DESCRIPTION '+channel+'\n')
+    i = i+2
+file.close()
